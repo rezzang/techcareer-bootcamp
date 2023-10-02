@@ -1020,6 +1020,6 @@ console.log("ismi a ile biten urunler:", nameEndsA.join(", "));
 console.log("id=10 olan urun:", product);
 console.log("discontinued false olan urun sayisi:", discontinuedFalseCounter);
 console.log("en pahali urun:", priceMaxName);
-console.log("en pahali urun:", priceMax);
+console.log("en pahali urun fiyati:", priceMax);
 console.log("en ucuz urun:", priceMinName);
-console.log("en ucuz urun:", priceMin);
+console.log("en ucuz urun fiyati:", priceMin);
