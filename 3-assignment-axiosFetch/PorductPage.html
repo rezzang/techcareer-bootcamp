@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js">
+      <link rel="stylesheet" href="reset.css" />
+    </script>
+  </head>
+  <style>
+    table {
+      width: 60vw;
+      position: absolute;
+      left: 20vw;
+      border-collapse: collapse;
+      margin-top: 5px;
+    }
+    th {
+      text-transform: capitalize;
+    }
+    th,
+    td {
+      padding-top: 10px;
+      padding-bottom: 10px;
+      text-align: left;
+      border-bottom: 1.5px solid gray;
+    }
+    td:nth-child(1) {
+      width: 5%;
+    }
+    td:nth-child(2) {
+      width: 60%;
+    }
+    td:nth-child(3) {
+      width: 12.5%;
+    }
+    td:nth-child(4) {
+      width: 12.5%;
+      border-right: 1px black;
+    }
+    td:nth-child(5) {
+      width: 100%;
+    }
+    button {
+      cursor: pointer;
+      width: 70%;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      text-transform: uppercase;
+      font-weight: bold;
+      border: 2px solid rgb(95, 95, 95);
+      background-color: gray;
+      color: white;
+    }
+
+    label {
+      font-size: 12px;
+      text-transform: capitalize;
+    }
+    .selection-filter {
+      float: right;
+      margin-right: 20px;
+      margin-top: 15px;
+    }
+  </style>
+
+  <body>
+    <div class="selection-filter">
+      <label for="select">Filter Unit Price by:</label>
+      <select id="select-id" onchange="filterTable()">
+        <option value="0">All</option>
+        <option value="0-10">0-10</option>
+        <option value="10-50">10-50</option>
+        <option value="50-100">50-100</option>
+        <option value="100-200">100-200</option>
+        <option value="200">200</option>
+      </select>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>name</th>
+          <th>unit price</th>
+          <th>stock</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <ul></ul>
+  </body>
+  <script>
+    const url = "https://northwind.vercel.app/api/products";
+    loadTable();
+
+    function loadTable() {
+      axios.get(url).then((res) => {
+        var products = res.data;
+
+        products.forEach((element) => {
+          const priceRange = document.getElementById("select-id").value;
+          const range = priceRange.split("-").map(Number);
+
+          if (
+            range <= element.unitPrice ||
+            (range[0] <= element.unitPrice && range[1] > element.unitPrice)
+          ) {
+            let productRow = document.createElement("tr");
+            productRow.setAttribute("id", `${element.id}`);
+            productRow.innerHTML = `<td>${element.id}</td>
+        <td>${element.name}</td>
+        <td>${element.unitPrice}</td>
+        <td>${element.unitsInStock}</td>
+        <td><button onclick="handleClick(event)">delete</button></td>`;
+            document.querySelector("table tbody").append(productRow);
+          }
+        });
+      });
+    }
+
+    const handleClick = (event) => {
+      console.log("button is clicked");
+      var rowToBeDeleted = event.target.parentNode.parentNode; // event.target->input element
+      rowToBeDeleted.parentNode.removeChild(rowToBeDeleted);
+
+      const idToBeDeleted = event.target.parentNode.parentNode.id;
+      rowDelete(idToBeDeleted);
+    };
+    const filterTable = () => {
+      const parent = document.querySelector("table tbody");
+
+      while (parent.hasChildNodes()) {
+        parent.removeChild(document.querySelector("table tbody").firstChild);
+      }
+      loadTable();
+    };
+
+    async function rowDelete(id) {
+      try {
+        const response = await axios.delete(`${url}/${id}`);
+        console.log("Product has been removed");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  </script>
+</html>
